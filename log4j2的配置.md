@@ -59,6 +59,7 @@
             <!-- 最多保留文件数 -->
             <DefaultRolloverStrategy max="20"/>
             <Filters>
+				<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）,ACCEPT(接受其及以上)，DENY(拒绝以下)，NEUTRAL(中立，由下一个ThresholdFilter处理)-->
                 <ThresholdFilter level="INFO" onMatch="DENY" onMismatch="NEUTRAL"/>
                 <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
