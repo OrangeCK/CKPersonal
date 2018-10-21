@@ -51,19 +51,25 @@
             <!--输出日志格式-->
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss}| %-5level|%ip|%thread| %logger{50}| %msg%n" />
         </Console>
-        <!--这个会打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <!--这个会只打印出所有的DEBUG信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
         <RollingFile name="RollingFile_Debug" fileName="${Log_Home}/debug/debug.log" filePattern="${Log_Home}$${date:yyyy-MM}/app-%d{yyyyMMddHHmmssSSS}.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss}| %-5level|%ip|%thread| %logger{50}| %msg%n" />
             <!-- 日志文件大小 -->
             <SizeBasedTriggeringPolicy size="20MB" />
             <!-- 最多保留文件数 -->
             <DefaultRolloverStrategy max="20"/>
+			<!--至于为什么只会打印出DEBUG级别的日志，就是因为下面的Filters标签,
+				onMatch="ACCEPT" 表示匹配该级别及以上
+				onMatch="DENY" 表示不匹配该级别及以上
+				onMatch="NEUTRAL" 表示该级别及以上的，由下一个filter处理，如果当前是最后一个，则表示匹配该级别及以上
+				onMismatch="ACCEPT" 表示匹配该级别以下
+				onMismatch="NEUTRAL" 表示该级别及以下的，由下一个filter处理，如果当前是最后一个，则不匹配该级别以下的-->
             <Filters>
-				<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）,ACCEPT(接受其及以上)，DENY(拒绝以下)，NEUTRAL(中立，由下一个ThresholdFilter处理)-->
                 <ThresholdFilter level="INFO" onMatch="DENY" onMismatch="NEUTRAL"/>
                 <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
         </RollingFile>
+		<!--这个会只打印出所有的INFO信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
         <RollingFile name="RollingFile_Info" fileName="${Log_Home}/info/info.log" filePattern="${Log_Home}$${date:yyyy-MM}/app-%d{yyyyMMddHHmmssSSS}.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss}| %-5level|%ip|%thread| %logger{50}| %msg%n" />
             <SizeBasedTriggeringPolicy size="20MB" />
@@ -73,6 +79,7 @@
                 <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
         </RollingFile>
+		<!--这个会只打印出所有的WARN信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
         <RollingFile name="RollingFile_Warn" fileName="${Log_Home}/warn/warn.log" filePattern="${Log_Home}$${date:yyyy-MM}/app-%d{yyyyMMddHHmmssSSS}.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss}| %-5level|%ip|%thread| %logger{50}| %msg%n" />
             <SizeBasedTriggeringPolicy size="20MB" />
@@ -82,6 +89,7 @@
                 <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
         </RollingFile>
+		<!--这个会只打印出所有的ERROR信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
         <RollingFile name="RollingFile_Error" fileName="${Log_Home}/error/error.log" filePattern="${Log_Home}$${date:yyyy-MM}/app-%d{yyyyMMddHHmmssSSS}.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss}| %-5level|%ip|%thread| %logger{50}| %msg%n" />
             <SizeBasedTriggeringPolicy size="20MB" />
@@ -93,7 +101,10 @@
     </appenders>
 
     <Loggers>
-        <!--然后定义logger，只有定义了logger并引入的appender，appender才会生效-->
+        <!--然后定义logger，只有定义了logger并引入的appender，
+			appender才会生效，additivity默认是true,表示将此logger的打印信息向上级传递，
+			在这儿root就是他的上级，root的设置的打印级别是debug,logger级别没有低于他，
+			所以root里面也会打印一遍-->
         <logger name="com.example.baseframe.myspringboot" level="DEBUG" additivity="true">
             <AppenderRef ref="RollingFile_Debug" />
             <AppenderRef ref="RollingFile_Info" />
